@@ -6,6 +6,7 @@
 enum {
     CT_LSFT,
     CT_RSFT,
+    CT_GUI,
 };
 
 typedef struct {
@@ -20,6 +21,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case TD(CT_LSFT):
         case TD(CT_RSFT):
+        case TD(CT_GUI):
             action = &tap_dance_actions[TD_INDEX(keycode)];
             if (!record->event.pressed && action->state.count && !action->state.finished) {
                 tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)action->user_data;
@@ -62,12 +64,14 @@ void tap_dance_tap_hold_reset(tap_dance_state_t *state, void *user_data) {
 tap_dance_action_t tap_dance_actions[] = {
     [CT_LSFT] = ACTION_TAP_DANCE_TAP_HOLD(KC_ENT, KC_LSFT),
     [CT_RSFT] = ACTION_TAP_DANCE_TAP_HOLD(KC_SPC, KC_RSFT),
+    // CT_GUI doesn't work because of DF(1)
+    // [CT_GUI] = ACTION_TAP_DANCE_TAP_HOLD(DF(1), KC_LGUI),
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      /* Layer 0 - Typing
       * ┌───┬───┬───┬───┬───┬───┐       ┌───┬───┬───┬───┬───┬───┐
-      * │Tab│ Q │ W │ F │ P │ B │       │ J │ L │ U │ Y │ ; │Del│
+      * │Tab│ Q │ W │ F │ P │ B │       │ J │ L │ U │ Y │ ; │GUI│
       * ├───┼───┼───┼───┼───┼───┤       ├───┼───┼───┼───┼───┼───┤
       * │Bsp│ A │ R │ S │ T │ G │       │ M │ N │ E │ I │ O │ ' │
       * ├───┼───┼───┼───┼───┼───┤       ├───┼───┼───┼───┼───┼───┤
@@ -75,15 +79,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       * └───┴───┴───┴───┴───┴───┘       └───┴───┴───┴───┴───┴───┘
       *               ┌───┐                   ┌───┐
       *               │CTL├───┐           ┌───┤ L2│
-      *               └───┤GUI├───┐   ┌───┤ L1├───┘
-      *                   └───┤S/E│   │S/_├───┘
+      *               └───┤ENT├───┐   ┌───┤ L1├───┘
+      *                   └───┤SFT│   │SPC├───┘
       *                       └───┘   └───┘
       */
     [0] = LAYOUT_split_3x6_3(
-        KC_TAB,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_B,                                 KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_DEL,
-        KC_BSPC, KC_A,    KC_R,    KC_S,    KC_T,    KC_G,                                 KC_M,    KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
-        KC_LALT, KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,                                 KC_K,    KC_H,    KC_COMM, KC_DOT,  KC_SLSH, DF(1),
-                                            KC_LCTL, KC_LGUI, TD(CT_LSFT),   TD(CT_RSFT),  OSL(1),  OSL(2)
+        KC_TAB,  KC_Q,    KC_W,    KC_F,    KC_P,    KC_B,                            KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN, KC_LGUI,
+        KC_BSPC, KC_A,    KC_R,    KC_S,    KC_T,    KC_G,                            KC_M,    KC_N,    KC_E,    KC_I,    KC_O,    KC_QUOT,
+        KC_LALT, KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,                            KC_K,    KC_H,    KC_COMM, KC_DOT,  KC_SLSH, DF(1),
+                                            KC_LCTL, KC_ENT, KC_LSFT,        KC_SPC,  OSL(1),  OSL(2)
     ),
      /* Layer 1 - Numbers & Symbols
       * ┌───┬───┬───┬───┬───┬───┐       ┌───┬───┬───┬───┬───┬───┐
